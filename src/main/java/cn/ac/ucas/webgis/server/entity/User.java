@@ -1,31 +1,11 @@
 package cn.ac.ucas.webgis.server.entity;
 
-import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.TableField;
 import lombok.Data;
 
-import java.io.Serial;
-import java.io.Serializable;
-import java.time.LocalDateTime;
-
 @Data
-public class User implements Serializable {
-    @Serial
-    private static final long serialVersionUID = 1L;
-    private long id;
-    private String name;
-    private String password;
-    private String gender;
+public class User {
     private String username;
-    private String idNumber;
-    private String phone;
-    private int status;
-    private LocalDateTime createTime;
-    private LocalDateTime updateTime;
-
-    @TableField(fill = FieldFill.INSERT)
-    private long createUser;
-
-    @TableField(fill = FieldFill.INSERT_UPDATE)
-    private long updateUser;
+    private String password;
+    private int code;
+    private boolean checked;
 }

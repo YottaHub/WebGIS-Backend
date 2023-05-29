@@ -12,14 +12,14 @@ import java.time.LocalDateTime;
 public class Employee implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
-    private long id;
+    private Long id;
     private String name;
     private String password;
     private String gender;
     private String username;
     private String idNumber;
     private String phone;
-    private int status;
+    private Integer status;
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
 
