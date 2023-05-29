@@ -1,10 +1,10 @@
 ---
-aliases: 'WebGis 课程作业'
+aliases: "WebGis 课程作业, 'WebGis 课程作业'"
 tags: 
 cssclass:
 source:
 created: "2023-05-29 16:31"
-updated: "2023-05-29 16:56"
+updated: "2023-05-29 17:23"
 ---
 # WebGis 课程作业
 
@@ -24,6 +24,64 @@ Welcome to the WebGIS Project! This project is a web-based Geographic Informatio
 ```bash
 git clone https://github.com/yottahub/WebGIS_Project.git
 ```
+
+### 项目结构
+
+```bash
+. 
+├── pom.xml 
+├── src 
+│ ├── lib # local libraries
+│ ├── main 
+│   ├── java 
+│   │ └── cn.ac.ucas.webgis.server
+│   │      ├── WebGisProjectApplication.java
+│   │      ├── common 
+│   │      │ └── Result.java 
+│   │      ├── config 
+│   │      │ └── WebMvcConfig.java 
+│   │      ├── controller 
+│   │      │ └── WebFeatureController.java 
+│   │      ├── entity 
+│   │      │ ├── # 项目使用实例
+│   │      ├── mapper 
+│   │      └── service
+│   └── resources
+│   ├── python # Python脚本
+│   ├── static # 网页资源
+│    └── page
+│         ├── scripts 
+│         └── styles
+└── target
+```
+
+1. Frontend Setup: 
+- Navigate to the `frontend` directory. 
+- Install the dependencies using `npm`: 
+
+```bash
+npm install
+```
+
+1. Backend Setup: 
+- Open the project in your Java IDE. 
+- Configure the MySQL database connection in the `application.properties` file. 
+
+1. Database Setup: 
+- Create a new MySQL database named `webgis`. 
+- Import the sample data provided in the `database` folder. 
+
+1. Running the Application: 
+
+- Frontend: In the `frontend` directory, run the following command: 
+
+```bash 
+npm run serve 
+``` 
+
+- Backend: Run the Java Spring Boot application from your IDE.
+
+1. Open your web browser and access the application at [http://localhost:12345](http://localhost:12345).
 
  ## 技术栈
 
