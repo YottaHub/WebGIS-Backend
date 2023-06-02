@@ -21,35 +21,35 @@ NIGHT_LIGHT_DIR = PARENT_DIR + '{}rasters{}NightLight{}'.format(separator, separ
 
 # os.environ['PROJ_LIB'] = r'C:\Users\cieta\AppData\Local\Programs\Python\Python38\Lib\site-packages\osgeo\data\proj'
 def raster2vector(raster_path, vecter_path, field_name="class", ignore_values = None):
-    
+
     # 读取路径中的栅格数据
     raster = gdal.Open(raster_path)
     # in_band 为想要转为矢量的波段,一般需要进行转矢量的栅格都是单波段分类结果
     # 若栅格为多波段,需要提前转换为单波段
     band = raster.GetRasterBand(1)
-    
+
     # 读取栅格的投影信息,为后面生成的矢量赋予相同的投影信息
     prj = osr.SpatialReference()
     prj.ImportFromWkt(raster.GetProjection())
-    
-    
+
+
     drv = ogr.GetDriverByName("ESRI Shapefile")
     # 若文件已经存在,删除
     if os.path.exists(vecter_path):
         drv.DeleteDataSource(vecter_path)
-        
+
     # 创建目标文件
     polygon = drv.CreateDataSource(vecter_path)
     # 创建面图层
     poly_layer = polygon.CreateLayer(vecter_path[:-4], srs=prj, geom_type=ogr.wkbMultiPolygon)
     # 添加浮点型字段,用来存储栅格的像素值
-    field = ogr.FieldDefn(field_name, ogr.OFTReal)  
+    field = ogr.FieldDefn(field_name, ogr.OFTReal)
     poly_layer.CreateField(field)
-    
+
     # FPolygonize将每个像元转成一个矩形，然后将相似的像元进行合并
     # 设置矢量图层中保存像元值的字段序号为0
     gdal.Polygonize(band, band, poly_layer, 0)
-    
+
     # 删除ignore_value链表中的类别要素
     if ignore_values is not None:
         for feature in poly_layer:
@@ -59,7 +59,7 @@ def raster2vector(raster_path, vecter_path, field_name="class", ignore_values = 
                     # 通过FID删除要素
                     poly_layer.DeleteFeature(feature.GetFID())
                     break
-                
+
     polygon.SyncToDisk()
     polygon = None
 
@@ -96,9 +96,9 @@ def uni(shpPath, fname):
             out_feature.SetGeometry(current_union)
             out_lyr.ResetReading()
             out_lyr.CreateFeature(out_feature)
-    
- 
-           
+
+
+
 def ChangeToJson():
     # print("Starting........")
     vector = OUT_DIR + "t2.shp"
@@ -109,7 +109,7 @@ def ChangeToJson():
     shp_ds = ogr.Open(vector)
     # print("sadasd",shp_ds)
     shp_lyr = shp_ds.GetLayer(0)
- 
+
     # 创建结果Geojson
     baseName = os.path.basename(output)
     out_driver = ogr.GetDriverByName('GeoJSON')
@@ -119,14 +119,14 @@ def ChangeToJson():
     out_lyr = out_ds.CreateLayer(baseName, shp_lyr.GetSpatialRef())
     out_lyr.CreateFields(shp_lyr.schema)
     out_feat = ogr.Feature(out_lyr.GetLayerDefn())
- 
+
     #生成结果文件
     for feature in shp_lyr:
         out_feat.SetGeometry(feature.geometry())
         for j in range(feature.GetFieldCount()):
             out_feat.SetField(j, feature.GetField(j))
         out_lyr.CreateFeature(out_feat)
- 
+
     del out_ds
     del shp_ds
     # print("Success........")
@@ -176,12 +176,12 @@ def zoneStatic(input_tif,input_shp,c):
     # 开始裁剪
     gdal.SetConfigOption("GDALWARP_IGNORE_BAD_CUTLINE", "YES")
     ds = gdal.Warp(output_file,
-                input_raster,
-                format = 'GTiff',
-                cutlineDSName = input_shp,
-                # cutlineWhere="NAME = " +"'" + featureName + "'",
-                cropToCutline=True,   
-                dstNodata = -9999)
+                   input_raster,
+                   format = 'GTiff',
+                   cutlineDSName = input_shp,
+                   # cutlineWhere="NAME = " +"'" + featureName + "'",
+                   cropToCutline=True,
+                   dstNodata = -9999)
     statisRaster = gdal.Open(output_file)
     cols = statisRaster.RasterXSize
     rows = statisRaster.RasterYSize
@@ -203,12 +203,12 @@ def zoneStatic(input_tif,input_shp,c):
     #         break
     for i in range(0,rows):
         for j in range(0,cols):
-                if data[i][j] != nodata:
-                    if data[i][j] < c:
-                        data[i][j] =-99
-                else:
-                    data[i][j] = -99
-    
+            if data[i][j] != nodata:
+                if data[i][j] < c:
+                    data[i][j] =-99
+            else:
+                data[i][j] = -99
+
     mask = np.less(data,c)   #设置掩膜
     resultPath = OUT_DIR + 't1.tif'
     output_format = "GTiff"
@@ -231,27 +231,26 @@ def zoneStatic(input_tif,input_shp,c):
     ds = None
     raster2vector(OUT_DIR + 't1.tif', OUT_DIR + 't1.shp','class',[-99])
 
-        # mask = np.greater(data,10)   #设置掩膜
-        
-        # print(featureName + ":" + str(50))
+    # mask = np.greater(data,10)   #设置掩膜
+
+    # print(featureName + ":" + str(50))
 
 def clip(input_tif,input_shp):
 
-# tif输入路径，打开文件
+    # tif输入路径，打开文件
 
     # 矢量文件路径，打开矢量文件
     input_raster=gdal.Open(input_tif)
     output_file = OUT_DIR + str(random.randint(100000,999999))  + '.tif'
     # 开始裁剪
     ds = gdal.Warp(output_file,
-                input_raster,
-                format = 'GTiff',
-                cutlineDSName = input_shp,
-                cropToCutline=True,   
-                dstNodata = -9999)
+                   input_raster,
+                   format = 'GTiff',
+                   cutlineDSName = input_shp,
+                   cropToCutline=True,
+                   dstNodata = -9999)
 
 if __name__ == '__main__':
-    # print(sys.argv)
     dict=[]
     for i in range(1, len(sys.argv)):
         url = int(sys.argv[i])
