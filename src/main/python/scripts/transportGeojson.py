@@ -257,7 +257,7 @@ if __name__ == '__main__':
         url = int(sys.argv[i])
         dict.append(url)
     # direct(3,3,50)
-    direct(dict[0],dict[0],dict[2])
+    direct(dict[1],dict[0],dict[2])
     ChangeToJson()
 with open(OUT_DIR + 't2.json') as txtfile2:
     print(txtfile2.read())

@@ -118,4 +118,4 @@ if __name__ == '__main__':
     for i in range(1, len(sys.argv)):
         url = int(sys.argv[i])
         dict.append(url)
-    add(1, 3)
+    add(dict[1], dict[0])
