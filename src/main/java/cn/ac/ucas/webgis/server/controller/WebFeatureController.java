@@ -1,23 +1,21 @@
 package cn.ac.ucas.webgis.server.controller;
 
+import cn.ac.ucas.webgis.server.common.IntPair;
+import cn.ac.ucas.webgis.server.common.IntTuple;
 import cn.ac.ucas.webgis.server.common.Result;
-import cn.ac.ucas.webgis.server.entity.IntPair;
-import cn.ac.ucas.webgis.server.entity.IntTuple;
-import cn.ac.ucas.webgis.server.entity.StrPair;
-import cn.ac.ucas.webgis.server.entity.User;
-import cn.ac.ucas.webgis.server.service.EmployService;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.http.HttpServletRequest;
+import cn.ac.ucas.webgis.server.common.StrPair;
 import lombok.extern.slf4j.Slf4j;
-import org.python.util.PythonInterpreter;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.sql.SQLOutput;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,67 +25,11 @@ import java.util.List;
 public class WebFeatureController {
 
     /** The path of the python scripts. */
-    private static final String PYTHON_SCRIPTS_PATH = "/src/main/python/";
-    @Autowired
-    private EmployService employService;
-
-    @PostMapping("/login")
-    public Result<Object> login(HttpServletRequest request, @RequestBody User user) throws IOException, InterruptedException {
-        System.out.println("Processing login request");
-
-        // Modify the user object
-        user.setUsername("后端逻辑?? + " + user.getUsername());
-
-        // Execute Python script
-        String pythonScript = "javaPythonFile.py";
-        String[] command = new String[]{"python", pythonScript, "1", "2"};
-        Process process = Runtime.getRuntime().exec(command);
-        InputStream ins = process.getInputStream();
-        BufferedReader reader = new BufferedReader(new InputStreamReader(ins));
-        String output = reader.readLine();
-        process.waitFor();
-
-        return Result.success(output);
-    }
-
-    /**
-     * Sample method for login.
-     * @return Result object containing the list of StrPair objects.
-     * @throws JsonProcessingException if there is an error while processing JSON.
-     */
-    @RequestMapping("/login")
-    public Result<Object> tableData() throws JsonProcessingException {
-        StrPair pair3J = new StrPair();
-        pair3J.setName("");
-        pair3J.setValue("1048");
-
-        StrPair pairYM = new StrPair();
-        pairYM.setName("");
-        pairYM.setValue("735");
-
-        StrPair pairYD = new StrPair();
-        pairYD.setName("");
-        pairYD.setValue("580");
-
-        StrPair pairCY = new StrPair();
-        pairCY.setName("");
-        pairCY.setValue("484");
-
-        StrPair pairPR = new StrPair();
-        pairPR.setName("");
-        pairPR.setValue("300");
-
-        List<StrPair> list = new ArrayList<>();
-        list.add(pair3J);
-        list.add(pairYM);
-        list.add(pairYD);
-        list.add(pairCY);
-        list.add(pairPR);
-
-        ObjectMapper mapper = new ObjectMapper();
-        String json = mapper.writeValueAsString(list);
-        return Result.success(list);
-    }
+    private static final String PYTHON_SCRIPTS_PATH = System.getProperty("user.dir") + File.separator + "src" +
+                                                      File.separator + "main" + File.separator + "python" +
+                                                      File.separator + "scripts" + File.separator;
+    /** The python command. */
+    private static final String PYTHON = "python3";
 
     /**
      * Sample method for testParam.
@@ -101,21 +43,9 @@ public class WebFeatureController {
         List<StrPair> result = resend2args(data, "test1.py");
         return Result.success(result);
     }
-    @PostMapping("/testParam2")
-    public Result<Object> testParam2(@RequestBody IntPair data) throws IOException, InterruptedException {
-        List<StrPair> result = resend2args(data, "jini.py");
-        return Result.success(result);
-    }
     @PostMapping("/yuzhifa")
     public Object transportGeoJson(@RequestBody IntTuple data)throws IOException, InterruptedException{
         System.out.println("阈值法");
-        List<StrPair> result = resend3args(data, "transportGeojson.py");
-        return Result.success(result);
-    }
-
-    @PostMapping("/tongjifa")
-    public Object transportGeoJson1(@RequestBody IntTuple data)throws IOException, InterruptedException{
-        System.out.println("统计数据比较法");
         List<StrPair> result = resend3args(data, "transportGeojson.py");
         return Result.success(result);
     }
@@ -138,14 +68,17 @@ public class WebFeatureController {
      */
     private List<StrPair> resend2args(IntPair intPair, String scriptName) throws IOException, InterruptedException {
         StringBuilder oss = new StringBuilder();
-        int first = intPair.getFirst();
-        int second = intPair.getSecond();
+        int first = intPair.getSelectedCityIndex();
+        int second = intPair.getSelectedYearIndex();
 
+        System.out.println("当前时间: " + LocalTime.now() + "参数1：" + first + "参数2：" + second + "脚本名：" +
+                            PYTHON + " " + PYTHON_SCRIPTS_PATH + scriptName);
         List<StrPair> resultList = new ArrayList<>();
         try {
             System.out.println("start");
-            String[] args = new String[] { "python", PYTHON_SCRIPTS_PATH + scriptName,
+            String[] args = new String[] { PYTHON, PYTHON_SCRIPTS_PATH + scriptName,
                                             String.valueOf(first), String.valueOf(second) };
+            System.out.println();
             Process process = Runtime.getRuntime().exec(args);
             BufferedReader in = new BufferedReader(new InputStreamReader(
                 process.getInputStream(),"GB2312"
@@ -182,14 +115,16 @@ public class WebFeatureController {
      */
     public List<StrPair> resend3args(IntTuple tuple, String scriptName) throws IOException, InterruptedException {
         StringBuilder oss = new StringBuilder();
-        int first = tuple.getFirst();
-        int second = tuple.getSecond();
-        int third = tuple.getThird();
+        int first = tuple.getSelectedCityIndex();
+        int second = tuple.getSelectedYearIndex();
+        int third = tuple.getSplitValue();
 
+        System.out.println("当前时间: " + LocalTime.now() + "\n参数1：" + first + "\t参数2：" + second + "\t参数3：" + third +
+                           "\n脚本名：" + PYTHON + " " + PYTHON_SCRIPTS_PATH + scriptName);
         List<StrPair> resultList = new ArrayList<>();
         try{
             System.out.println("start");
-            String[] args = new String[] { "python", PYTHON_SCRIPTS_PATH + scriptName,
+            String[] args = new String[] { PYTHON, PYTHON_SCRIPTS_PATH + scriptName,
                                             String.valueOf(first), String.valueOf(second), String.valueOf(third) };
             Process pr = Runtime.getRuntime().exec(args);
             BufferedReader in = new BufferedReader(new InputStreamReader(
