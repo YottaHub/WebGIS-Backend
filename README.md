@@ -45,9 +45,9 @@
 
     ```bash
     # frontend
-    git clone https://github.com/yottahub/WebGIS-Project
+    git clone https://github.com/yottahub/WebGIS-Backend
     # backend
-    git clone https://github.com/yottahub/Vue_Cesium
+    git clone https://github.com/yottahub/WebGIS-Frontend
     ```
 
     项目文件结构（前端）。
