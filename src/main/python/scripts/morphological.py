@@ -15,8 +15,10 @@ else:
 
 PARENT_DIR = os.getcwd() + '{}src{}main{}python'.format(separator, separator, separator)
 OUT_DIR = PARENT_DIR + '{}out{}'.format(separator, separator)
+#os.environ['PROJ_LIB'] = r'C:\Users\cieta\AppData\Local\Programs\Python\Python38\Lib\site-packages\osgeo\data\proj'
 
-# os.environ['PROJ_LIB'] = r'C:\Users\cieta\AppData\Local\Programs\Python\Python38\Lib\site-packages\osgeo\data\proj'
+
+
 def segments(poly):
     """A sequence of (x,y) numeric coordinates pairs """
     return zip(poly, poly[1:] + [poly[0]])

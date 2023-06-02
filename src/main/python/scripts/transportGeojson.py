@@ -18,8 +18,9 @@ else:
 PARENT_DIR = os.getcwd() + '{}src{}main{}python'.format(separator, separator, separator)
 OUT_DIR = PARENT_DIR + '{}out{}'.format(separator, separator)
 NIGHT_LIGHT_DIR = PARENT_DIR + '{}rasters{}NightLight{}'.format(separator, separator, separator)
+#os.environ['PROJ_LIB'] = r'C:\Users\cieta\AppData\Local\Programs\Python\Python38\Lib\site-packages\osgeo\data\proj'
 
-# os.environ['PROJ_LIB'] = r'C:\Users\cieta\AppData\Local\Programs\Python\Python38\Lib\site-packages\osgeo\data\proj'
+
 def raster2vector(raster_path, vecter_path, field_name="class", ignore_values = None):
 
     # 读取路径中的栅格数据
@@ -256,7 +257,7 @@ if __name__ == '__main__':
         url = int(sys.argv[i])
         dict.append(url)
     # direct(3,3,50)
-    direct(dict[0],dict[1],dict[2])
+    direct(dict[0],dict[0],dict[2])
     ChangeToJson()
 with open(OUT_DIR + 't2.json') as txtfile2:
     print(txtfile2.read())

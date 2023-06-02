@@ -46,14 +46,15 @@ public class WebFeatureController {
     @PostMapping("/yuzhifa")
     public Object transportGeoJson(@RequestBody IntTuple data)throws IOException, InterruptedException{
         System.out.println("阈值法");
-        String result = (String) resend3args(data, "transportGeojson.py", false);
+        String result = (String) resend3args(data, "transportGeojson.py", false,false);
         return Result.success(result);
     }
 
     @PostMapping("/morphological")
     public Object morph(@RequestBody IntTuple data)throws IOException, InterruptedException{
         System.out.println("形态特征分析");
-        List<StrPair> result = (List<StrPair>) resend3args(data, "morphological.py", true);
+        String result = (String) resend3args(data, "morphological.py", true,true);
+        System.out.println(result);
         return Result.success(result);
     }
 
@@ -113,7 +114,7 @@ public class WebFeatureController {
      * @throws IOException if an I/O error occurs.
      * @throws InterruptedException if the current thread is interrupted.
      */
-    public Object resend3args(IntTuple tuple, String scriptName, boolean flag) throws IOException, InterruptedException {
+    public Object resend3args(IntTuple tuple, String scriptName, boolean flag,boolean isSingleLine) throws IOException, InterruptedException {
         StringBuilder oss = new StringBuilder();
         int first = tuple.getSelectedCityIndex();
         int second = tuple.getSelectedYearIndex();
@@ -132,10 +133,15 @@ public class WebFeatureController {
             ));
             String line;
             while ((line = in.readLine()) != null){
+                System.out.println("返回数据:" + line);
+                if (isSingleLine){
+                    return line;
+                }
                 String[] iss = line.split(":");
                 StrPair pair = new StrPair();
                 oss.append(line);
                 if (flag) {
+                    System.out.println(iss);
                     pair.setName(iss[0]);
                     pair.setValue(iss[1]);
                     resultList.add(pair);
